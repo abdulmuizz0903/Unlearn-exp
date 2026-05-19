@@ -9,6 +9,14 @@ Target unlearned digit: **3**
 | 256 | 97.51% | 97.62% | 96.53% | 78.05% | 86.42% | 3.56% |
 | 512 | 97.63% | 97.62% | 97.72% | 78.84% | 86.71% | 8.81% |
 | 1024 | 97.63% | 97.71% | 96.93% | 80.80% | 89.19% | 6.14% |
+
+**Single-Layer Experiment Plots:**
+![Sample Size](plots/exp1_sample_size.png)
+![Hidden Size](plots/exp2_hidden_size.png)
+![Iterations](plots/exp3_iterations.png)
+![Percentile Threshold](plots/exp4_percentile.png)
+![Penalty Scale](plots/exp5_penalty_scale.png)
+
 ---
 ## Multi-Layer Unlearning Results
 
@@ -22,4 +30,13 @@ Target unlearned digit: **3**
 | [256, 128, 64] | 97.37% | 97.43% | 96.83% | 77.13% | 84.20% | 14.16% |
 | [512, 256, 128] | 97.29% | 97.10% | 99.01% | 85.20% | 94.03% | 6.63% |
 | [1024, 512, 256] | 97.51% | 97.39% | 98.61% | 87.25% | 97.05% | 0.00% |
+
+**Multi-Layer Experiment Plots:**
+![Deep Samples](plots/deep_exp1_samples.png)
+![Deep Architecture](plots/deep_exp2_architectures.png)
+![Deep Iterations](plots/deep_exp3_iters.png)
+![Deep Percentile](plots/deep_exp4_percentile.png)
+![Deep Penalty](plots/deep_exp5_penalty.png)
+![Deep Digits](plots/deep_exp6_digits.png)
+
 ---

@@ -73,6 +73,13 @@ For single-layer MLPs, unlearning is fundamentally challenging because neurons a
 
 * **Observation**: Smaller architectures fail to isolate the digit, leading to massive collateral damage (Retain accuracy drops to ~69%). Wider networks (1024) have spare capacity, allowing for cleaner, class-specific node targeting (Retain accuracy ~89%), but still struggle to perfectly eliminate knowledge of `3`.
 
+**Single-Layer Experiment Plots:**
+![Sample Size](plots/exp1_sample_size.png)
+![Hidden Size](plots/exp2_hidden_size.png)
+![Iterations](plots/exp3_iterations.png)
+![Percentile Threshold](plots/exp4_percentile.png)
+![Penalty Scale](plots/exp5_penalty_scale.png)
+
 ### Multi-Layer (Deep) Architecture
 We applied the exact same unlearning constraints (targeting the *last* hidden representation layer before the classification head) across 2-layer and 3-layer networks. 
 
@@ -86,6 +93,20 @@ We applied the exact same unlearning constraints (targeting the *last* hidden re
 | **[1024, 512, 256]** | 97.51% | 97.39% | 98.61% | **87.25%** | **97.05%** | **0.00%** |
 
 * **Observation**: Depth drastically promotes feature disentanglement. The `[1024, 512, 256]` sequence was incredibly successful. After unlearning operations, we achieved exactly **0.00% accuracy on the target digit**, yet largely preserved the retain performance at **97.05%**. This approaches the theoretical maximum (89.9%) for a flawless surgical unlearning deletion.
+
+**Multi-Layer Experiment Plots:**
+![Deep Samples](plots/deep_exp1_samples.png)
+![Deep Architecture](plots/deep_exp2_architectures.png)
+![Deep Iterations](plots/deep_exp3_iters.png)
+![Deep Percentile](plots/deep_exp4_percentile.png)
+![Deep Penalty](plots/deep_exp5_penalty.png)
+![Deep Digits](plots/deep_exp6_digits.png)
+
+### Activation Profiling Sample Size
+From the results of tracking the number of samples in the forward pass for activation profiling versus forget accuracy, we can see that **even a small number of samples in the forward pass can perform almost similarly to a sample size of ~6000**. The model effectively identifies the critical target-related pathways using a fraction of the full dataset.
+
+### The Digit 8 Unlearning Anomaly
+During evaluations across different classes, we discovered substantial **unlearning resistance** specifically for digit `8`. Because `8` shares many topological features (loops, curves) with digits like `0`, `3`, `6`, and `9`, the network creates highly entangled, polysemantic representations. Deep architectures actively resisted forgetting `8` to protect the retain set. For a deeper analysis on polysemantic overlap and unlearning limits, please refer to [DIGIT_8.md](DIGIT_8.md).
 
 ## Running the Code
 1. Ensure the `Unlearn` Conda environment is active (Requires PyTorch and Torchvision).

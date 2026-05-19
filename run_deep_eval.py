@@ -4,7 +4,7 @@ from data import get_mnist_dataloaders
 from train import train_model, evaluate_model
 from unlearn import unlearn
 
-def run_experiment(hidden_sizes, device, val_pack, forget_digit):
+def run_experiment(hidden_sizes, device, val_pack, forget_digit, penalty_scale=0.1, threshold_percentile=90, iter_times=5):
     train_loader, test_loader, forget_loader, retain_loader, test_forget_loader, test_retain_loader = val_pack
     print(f'\n========================================')
     print(f'Running Experiment for Hidden Layers: {hidden_sizes}')
@@ -16,7 +16,7 @@ def run_experiment(hidden_sizes, device, val_pack, forget_digit):
     base_ret = evaluate_model(model, test_retain_loader, device, name='Retain Set')
     base_forg = evaluate_model(model, test_forget_loader, device, name='Forget Set')
     
-    model = unlearn(model, forget_loader, device, penalty_scale=0.1, threshold_percentile=90, iter_times=5)
+    model = unlearn(model, forget_loader, device, penalty_scale=penalty_scale, threshold_percentile=threshold_percentile, iter_times=iter_times)
     
     post_over = evaluate_model(model, test_loader, device, name='Overall Test Set')
     post_ret = evaluate_model(model, test_retain_loader, device, name='Retain Set')

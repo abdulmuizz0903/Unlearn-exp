@@ -33,5 +33,6 @@ def evaluate_model(model, test_loader, device, name="Test"):
             correct += (predicted == target).sum().item()
     
     accuracy = 100 * correct / total
-    print(f"{name} Accuracy: {accuracy:.2f}%")
+    if name != "silent":
+        print(f"{name} Accuracy: {accuracy:.2f}%")
     return accuracy
