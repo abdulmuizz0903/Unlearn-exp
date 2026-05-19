@@ -3,10 +3,30 @@
 This project implements a mechanistic approach to Machine Unlearning on simple Multilayer Perceptron (MLP) architectures trained on the MNIST dataset. The goal is to "unlearn" a specific class (in this case, the digit `3`) without retraining the model from scratch, while preserving the accuracy on the rest of the classes.
 
 ## Methodology: Activation Penalization
-The unlearning algorithm isolates the specific neurons responsible for representing the targeted class:
-1. **Activation Profiling**: We pass a "Forget Set" (images of the target digit) through the network and compute the mean activation of the neurons in the final hidden layer.
-2. **Targeted Pruning**: We isolate the most active neurons (e.g., top 10% active neurons for the target digit).
-3. **Weight Penalization**: We heavily penalize (scale down) the incoming and outgoing weights of these highly active neurons. Over iterative passes, the model cleanly dissects and destroys the feature representation of the targeted class.
+
+The unlearning algorithm employs a Mechanistic Iterative Node Ablation technique. Given a pre-trained neural network $f_\theta$, we isolate and penalize the specific parameter pathways responsible for representing the targeted class knowledge.
+
+### Formal Mathematical Formulation
+
+Let $\mathcal{D}_f = \{x_i, y_i\}_{i=1}^N$ represent the **Forget Set** containing strictly the target class $c_f$ (e.g., the digit $3$). Let the target hidden layer map inputs to an activation vector $a(x) \in \mathbb{R}^H$, parameterized by incoming weights $W_{in}$ and bias $b_{in}$, and mapping to subsequent layers via outgoing weights $W_{out}$.
+
+**1. Activation Profiling:**  
+We compute the expected activation $\mu_j$ for each neuron $j \in \{1, \dots, H\}$ over the forget set $\mathcal{D}_f$:
+$$ \mu_j = \mathbb{E}_{x \sim \mathcal{D}_f}[a_j(x)] = \frac{1}{N} \sum_{i=1}^{N} a_j(x_i) $$
+
+**2. Targeted Masking (Neuron Selection):**  
+We define a threshold $\tau$ corresponding to the $q$-th percentile (e.g., $q=90$) of the empirical distribution of $\mu$. We then construct a binary mask $m \in \{0, 1\}^H$, mathematically isolating the top highly active neurons responsible for expressing the forget class:
+$$ m_j = \begin{cases} 1, & \text{if } \mu_j \geq \tau \\ 0, & \text{otherwise} \end{cases} $$
+Let $\mathcal{V}_{active} = \{j \mid m_j = 1\}$ denote the targeted subset of neurons.
+
+**3. Iterative Weight Penalization:**  
+To systematically suppress the network's predictive capabilities for $c_f$, we directly scale the parameters contributing to the forward-pass and readout of $\mathcal{V}_{active}$. Given a penalty scaling factor $\lambda \in [0, 1)$ (e.g., $\lambda = 0.1$), for each iteration block $t = 1 \dots T$, we apply the following multiplicative decay to the specific weights associated with the targeted neurons $j \in \mathcal{V}_{active}$:
+
+$$ W_{in}^{(t)}[j, :] \leftarrow \lambda \cdot W_{in}^{(t-1)}[j, :] $$
+$$ b_{in}^{(t)}[j] \leftarrow \lambda \cdot b_{in}^{(t-1)}[j] $$
+$$ W_{out}^{(t)}[:, j] \leftarrow \lambda \cdot W_{out}^{(t-1)}[:, j] $$
+
+Over $T$ iterative passes (which forces continuous re-profiling of fallback features), the model geometrically collapses the embedded manifold of the targeted class while generally leaving disjoint feature spaces (the Retain Set) intact.
 
 ---
 
